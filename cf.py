@@ -1,10 +1,12 @@
+import itertools
+
 import sympy
 from sympy import Abs, pi, floor
 import sympy.ntheory.continued_fraction as cf_mod
 
 def main():
     N=200
-    pi_cf_list = list(pi_cf_n_recurrance(N))
+    pi_cf_list = list(pi_recurrance_1(N))
     prev_pi_cf = 0
     for i in range(0, N):
         cur_pi_cf = pi_cf_n(i)
@@ -59,13 +61,62 @@ def pi_cf_n_recurrance(n):
     yield A_cur/B_cur
     for i in range(1, n):
         a_next = (2*i-1)**2
-        A_next = 6*A_cur+a_next*A_prev
-        B_next = 6*B_cur+a_next*B_prev
+        b_next = 6
+        A_next = b_next*A_cur+a_next*A_prev
+        B_next = b_next*B_cur+a_next*B_prev
         A_prev = A_cur
         B_prev = B_cur
         A_cur = A_next
         B_cur = B_next
         yield A_cur/B_cur
+
+def pi_recurrance_1(n):
+    """
+    Uses the definition of pi as
+
+        inf
+    3 + K   (2x-1)**2/6
+        x=1
+
+    and the general continued fraction recurrance
+    """
+    def num_iter_func():
+        for i in itertools.count(start=1):
+            yield (2*i-1)**2
+
+    num_iter = iter(num_iter_func())
+    den_iter = itertools.repeat(6)
+
+    yield from cf_n_recurrance(3, num_iter, den_iter, n)
+    
+
+def cf_n_recurrance(start_val, a_iter, b_iter, n):
+    A_prev = 1
+    B_prev = 0
+    A_cur = start_val
+    B_cur = 1
+    yield A_cur/B_cur
+    for i in range(1,n):
+        a_next = next(a_iter)
+        b_next = next(b_iter)
+        A_next = b_next*A_cur+a_next*A_prev
+        B_next = b_next*B_cur+a_next*B_prev
+        A_prev = A_cur
+        B_prev = B_cur
+        A_cur = A_next
+        B_cur = B_next
+        yield A_cur/B_cur
+
+def pi_cf_n_recurrance_2(n):
+    """
+    Uses the definition of pi/2 as
+
+    successive an/bn for general continued recurrance
+
+    an   1 -2*3 -1*2 -4*5 -3*4
+
+    bn   3    1    3    1    3
+    """
 
 if __name__ == '__main__':
     main()
