@@ -10,7 +10,8 @@ def main():
     N=50
     # pi_list = list(pi_recurrance_1(N))
     # pi_list = list(pi_recurrance_2(N))
-    pi_list = list(pi_bpp(N))
+    # pi_list = list(pi_bpp(N))
+    pi_list = list(pi_bellard(N))
     prev_pi = 0
     for i in range(0, N):
         cur_pi = pi_list[i]
@@ -26,9 +27,22 @@ def require(cond, msg):
     if not cond:
         raise RequirementError(msg)
 
+bellard_nums  = (-2**5, -1, 2**8, -2**6, -2**2,     -2**2,  1)
+bellard_d_mul = (4,     4,  10,     10,     10,     10,     10)
+bellard_d_off = (1,     3,  1,      3,      5,      7,      9)
+def pi_bellard(n):
+    total = 0
+    for k in range(n):
+        val = 0
+        for i in range(7):
+            val += S(bellard_nums[i])/S(bellard_d_mul[i]*k + bellard_d_off[i])
+
+        val *= (-1)**n/S(2**(10*n+6))
+        total += val
+        yield total
+
 bpp_numerators = (4, -2, -1, -1)
 bpp_offsets = (1, 4, 5, 6)
-
 def pi_bpp(n):
     total = 0
     for k in range(n):
